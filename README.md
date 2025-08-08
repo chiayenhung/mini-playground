@@ -2,6 +2,8 @@
 
 A simple chat interface for interacting with Fireworks AI models. Built with Next.js, TypeScript, and Tailwind CSS.
 
+🚀 **Live Demo**: [https://mini-playground.vercel.app/](https://mini-playground.vercel.app/)
+
 ## Features
 
 - **Model Selection**: Dropdown to choose from available Fireworks models
