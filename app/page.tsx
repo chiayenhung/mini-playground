@@ -30,9 +30,18 @@ export default function Page() {
       try {
         const res = await fetch('/api/models', { cache: 'no-store' })
         if (!res.ok) throw new Error('Failed to load models')
-        const data = (await res.json()) as Model[]
-        setModels(data)
-        if (data.length > 0) setSelectedModel(data[0].id)
+        const raw = (await res.json()) as any[]
+        const normalized: Model[] = (raw || [])
+          .map((m: any) => {
+            const id = m?.id ?? m?.name ?? m?.model ?? m?.slug
+            const title = m?.title ?? m?.display_name ?? m?.name ?? id
+            const description = m?.description ?? ''
+            return id ? ({ id, title, description } as Model) : null
+          })
+          .filter(Boolean) as Model[]
+
+        setModels(normalized)
+        if (normalized.length > 0) setSelectedModel(normalized[0].id)
       } catch (e: any) {
         setError(e?.message ?? 'Unable to fetch models')
       }
