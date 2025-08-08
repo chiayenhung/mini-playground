@@ -101,14 +101,18 @@ export default function Page() {
               })
               setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, content: m.content + evt.delta } : m)))
             } else if (evt.type === 'error' && evt.error) {
-              setError(evt.error)
+              setMessages((prev) =>
+                prev.map((m) => (m.id === assistantId ? { ...m, content: `Error: ${evt.error}` } : m)),
+              )
             }
           } catch {}
         }
       }
       setTimings((t) => ({ ...t, [assistantId]: { ...t[assistantId], finishedAt: performance.now() } }))
     } catch (e: any) {
-      setError(e?.message ?? 'Unexpected error')
+      const msg = e?.message ?? 'Unexpected error'
+      setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, content: `Error: ${msg}` } : m)))
+      setTimings((t) => ({ ...t, [assistantId]: { ...t[assistantId], finishedAt: performance.now() } }))
     } finally {
       setLoading(false)
       abortRef.current = null
@@ -144,29 +148,35 @@ export default function Page() {
           <div className="text-sm text-neutral-400">Ask anything to get started.</div>
         )}
         {messages.map((m) => (
-          <div
-            key={m.id}
-            className={`whitespace-pre-wrap rounded-md px-3 py-2 ${m.role === 'user' ? 'bg-neutral-800' : 'bg-neutral-900 border border-neutral-800'}`}
-          >
-            <div className="mb-1 text-xs uppercase tracking-wide text-neutral-400">{m.role}</div>
-            <div className="text-sm leading-relaxed">{m.content}</div>
-            {m.role === 'assistant' && timings[m.id]?.finishedAt && (
-              <div className="mt-2 text-[10px] text-neutral-500">
-                {(() => {
-                  const t = timings[m.id]
-                  const ttfb = t.firstTokenAt ? Math.max(0, t.firstTokenAt - t.startedAt) : null
-                  const total = Math.max(0, t.finishedAt! - t.startedAt)
-                  return `time to first token: ${ttfb ? ttfb.toFixed(0) : '—'} ms · total: ${total.toFixed(0)} ms`
-                })()}
+          <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div
+              className={`w-2/5 whitespace-pre-wrap rounded-md px-3 py-2 ${
+                m.role === 'user' ? 'bg-neutral-800' : 'bg-neutral-900 border border-neutral-800'
+              }`}
+            >
+              <div className="mb-1 text-xs uppercase tracking-wide text-neutral-400">{m.role}</div>
+              <div
+                className={`text-sm leading-relaxed ${
+                  m.role === 'assistant' && m.content.startsWith('Error:') ? 'text-red-400' : ''
+                }`}
+              >
+                {m.content}
               </div>
-            )}
+              {m.role === 'assistant' && timings[m.id]?.finishedAt && (
+                <div className="mt-2 text-[10px] text-neutral-500">
+                  {(() => {
+                    const t = timings[m.id]
+                    const ttfb = t.firstTokenAt ? Math.max(0, t.firstTokenAt - t.startedAt) : null
+                    const total = Math.max(0, t.finishedAt! - t.startedAt)
+                    return `time to first token: ${ttfb ? ttfb.toFixed(0) : '—'} ms · total: ${total.toFixed(0)} ms`
+                  })()}
+                </div>
+              )}
+            </div>
           </div>
         ))}
         {loading && (
           <div className="text-xs text-neutral-400 animate-pulse">Streaming…</div>
-        )}
-        {error && (
-          <div className="text-xs text-red-400">{error}</div>
         )}
       </section>
 
