@@ -17,6 +17,7 @@ export function useChat() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [timings, setTimings] = useState<Record<string, ChatTiming>>({})
+  const [autoScroll, setAutoScroll] = useState(true)
   const abortRef = useRef<AbortController | null>(null)
 
   const sendMessage = useCallback(async (model: string, input: string) => {
@@ -108,13 +109,19 @@ export function useChat() {
     setError(null)
   }, [])
 
+  const toggleAutoScroll = useCallback(() => {
+    setAutoScroll(prev => !prev)
+  }, [])
+
   return {
     messages,
     loading,
     error,
     timings,
+    autoScroll,
     sendMessage,
     stop,
     clearMessages,
+    toggleAutoScroll,
   }
 }

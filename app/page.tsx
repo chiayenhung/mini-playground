@@ -1,16 +1,24 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useRef, useEffect } from 'react'
 import { useModels } from '@/hooks/use-models'
 import { useChat } from '@/hooks/use-chat'
 
 export default function Page() {
   const { models, loading: modelsLoading, error: modelsError } = useModels()
-  const { messages, loading, timings, sendMessage, stop } = useChat()
+  const { messages, loading, timings, autoScroll, sendMessage, stop, toggleAutoScroll } = useChat()
   const [selectedModel, setSelectedModel] = useState<string>('')
   const [input, setInput] = useState('')
+  const chatRef = useRef<HTMLDivElement>(null)
 
   const canSend = useMemo(() => !loading && !!selectedModel && input.trim().length > 0, [loading, selectedModel, input])
+
+  // Auto-scroll to bottom when new messages arrive or content updates
+  useEffect(() => {
+    if (autoScroll && chatRef.current) {
+      chatRef.current.scrollTop = chatRef.current.scrollHeight
+    }
+  }, [messages, autoScroll])
 
   const onSend = async () => {
     if (!canSend) return
@@ -56,42 +64,60 @@ export default function Page() {
         <div className="text-sm text-red-400">Error loading models: {modelsError}</div>
       )}
 
-      <section className="h-[60vh] overflow-y-auto rounded-lg border border-neutral-800 bg-neutral-900/50 p-4 space-y-3">
-        {messages.length === 0 && (
-          <div className="text-sm text-neutral-400">Ask anything to get started.</div>
-        )}
-        {messages.map((m) => (
-          <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div
-              className={`w-2/5 whitespace-pre-wrap rounded-md px-3 py-2 ${
-                m.role === 'user' ? 'bg-neutral-800' : 'bg-neutral-900 border border-neutral-800'
-              }`}
-            >
-              <div className="mb-1 text-xs uppercase tracking-wide text-neutral-400">{m.role}</div>
+      <div className="relative">
+        <section 
+          ref={chatRef}
+          className="h-[60vh] overflow-y-auto rounded-lg border border-neutral-800 bg-neutral-900/50 p-4 space-y-3"
+        >
+          {messages.length === 0 && (
+            <div className="text-sm text-neutral-400">Ask anything to get started.</div>
+          )}
+          {messages.map((m) => (
+            <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div
-                className={`text-sm leading-relaxed ${
-                  m.role === 'assistant' && m.content.startsWith('Error:') ? 'text-red-400' : ''
+                className={`w-2/5 whitespace-pre-wrap rounded-md px-3 py-2 ${
+                  m.role === 'user' ? 'bg-neutral-800' : 'bg-neutral-900 border border-neutral-800'
                 }`}
               >
-                {m.content}
-              </div>
-              {m.role === 'assistant' && timings[m.id]?.finishedAt && (
-                <div className="mt-2 text-[10px] text-neutral-500">
-                  {(() => {
-                    const t = timings[m.id]
-                    const ttfb = t.firstTokenAt ? Math.max(0, t.firstTokenAt - t.startedAt) : null
-                    const total = Math.max(0, t.finishedAt! - t.startedAt)
-                    return `time to first token: ${ttfb ? ttfb.toFixed(0) : '—'} ms · total: ${total.toFixed(0)} ms`
-                  })()}
+                <div className="mb-1 text-xs uppercase tracking-wide text-neutral-400">{m.role}</div>
+                <div
+                  className={`text-sm leading-relaxed ${
+                    m.role === 'assistant' && m.content.startsWith('Error:') ? 'text-red-400' : ''
+                  }`}
+                >
+                  {m.content}
                 </div>
-              )}
+                {m.role === 'assistant' && timings[m.id]?.finishedAt && (
+                  <div className="mt-2 text-[10px] text-neutral-500">
+                    {(() => {
+                      const t = timings[m.id]
+                      const ttfb = t.firstTokenAt ? Math.max(0, t.firstTokenAt - t.startedAt) : null
+                      const total = Math.max(0, t.finishedAt! - t.startedAt)
+                      return `time to first token: ${ttfb ? ttfb.toFixed(0) : '—'} ms · total: ${total.toFixed(0)} ms`
+                    })()}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-        {loading && (
-          <div className="text-xs text-neutral-400 animate-pulse">Streaming…</div>
-        )}
-      </section>
+          ))}
+          {loading && (
+            <div className="text-xs text-neutral-400 animate-pulse">Streaming…</div>
+          )}
+        </section>
+        
+        {/* Auto-scroll toggle button */}
+        <button
+          onClick={toggleAutoScroll}
+          className={`absolute top-2 right-2 px-2 py-1 text-xs rounded border ${
+            autoScroll 
+              ? 'bg-blue-600 border-blue-500 text-white' 
+              : 'bg-neutral-800 border-neutral-600 text-neutral-300'
+          }`}
+          title={autoScroll ? 'Auto-scroll enabled' : 'Auto-scroll disabled'}
+        >
+          {autoScroll ? '⏸' : '▶'}
+        </button>
+      </div>
 
       <form
         className="flex items-end gap-2"
@@ -122,8 +148,6 @@ export default function Page() {
           )}
         </div>
       </form>
-
-      <footer className="text-xs text-neutral-500">Uses Fireworks Chat API. Add your API key in .env.local.</footer>
     </main>
   )
 }
