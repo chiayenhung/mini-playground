@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 
 type Model = {
   id: string
+  title?: string
   display_name?: string
   description?: string
 }
@@ -131,7 +132,7 @@ export default function Page() {
           >
             {models.map((m) => (
               <option key={m.id} value={m.id}>
-                {m.display_name ?? m.id}
+                {m.title ?? m.display_name ?? m.id}
               </option>
             ))}
           </select>
