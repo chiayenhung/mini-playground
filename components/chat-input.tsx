@@ -19,12 +19,24 @@ export function ChatInput({ onSendMessage, onStop, loading, disabled }: ChatInpu
     setInput('')
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      if (canSend) {
+        onSendMessage(input.trim())
+        setInput('')
+      }
+    }
+    // Shift+Enter allows new line (default textarea behavior)
+  }
+
   return (
     <form className="flex items-end gap-2" onSubmit={handleSubmit}>
       <textarea
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        placeholder="Type your prompt…"
+        onKeyDown={handleKeyDown}
+        placeholder="Type your prompt… (Enter to send, Shift+Enter for new line)"
         rows={3}
         className="flex-1 resize-none rounded-md border border-neutral-700 bg-neutral-900 p-3 text-sm outline-none focus:border-neutral-500"
         disabled={disabled}
