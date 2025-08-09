@@ -38,7 +38,15 @@ export function ChatMessage({ message, timing }: ChatMessageProps) {
             {(() => {
               const ttfb = timing.firstTokenAt ? Math.max(0, timing.firstTokenAt - timing.startedAt) : null
               const total = Math.max(0, timing.finishedAt - timing.startedAt)
-              return `time to first token: ${ttfb ? ttfb.toFixed(0) : '—'} ms · total: ${total.toFixed(0)} ms`
+              
+              // Use actual token count if available, otherwise estimate
+              const actualTokens = timing.tokenCount
+              const estimatedTokens = Math.round(message.content.length / 4)
+              const tokens = actualTokens || estimatedTokens
+              const tokensPerSecond = total > 0 ? (tokens / (total / 1000)).toFixed(1) : '—'
+              const tokenDisplay = actualTokens ? `${tokensPerSecond}` : `~${tokensPerSecond}`
+              
+              return `ttfb: ${ttfb ? ttfb.toFixed(0) : '—'}ms · total: ${total.toFixed(0)}ms · ${tokenDisplay} tok/s`
             })()}
           </div>
         )}

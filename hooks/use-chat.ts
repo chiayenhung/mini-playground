@@ -10,6 +10,7 @@ export type ChatTiming = {
   startedAt: number
   firstTokenAt?: number
   finishedAt?: number
+  tokenCount?: number
 }
 
 export function useChat() {
@@ -34,7 +35,7 @@ export function useChat() {
     const controller = new AbortController()
     abortRef.current = controller
     const startedAt = performance.now()
-    setTimings((t) => ({ ...t, [assistantId]: { startedAt } }))
+    setTimings((t) => ({ ...t, [assistantId]: { startedAt, tokenCount: 0 } }))
 
     try {
       const res = await fetch('/api/chat', {
@@ -75,9 +76,10 @@ export function useChat() {
             if (evt.type === 'content.delta' && evt.delta) {
               setTimings((t) => {
                 const prev = t[assistantId]
+                const tokenCount = (prev?.tokenCount || 0) + 1 // Increment token count
                 return prev?.firstTokenAt
-                  ? t
-                  : { ...t, [assistantId]: { ...prev, firstTokenAt: performance.now() } }
+                  ? { ...t, [assistantId]: { ...prev, tokenCount } }
+                  : { ...t, [assistantId]: { ...prev, firstTokenAt: performance.now(), tokenCount } }
               })
               setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, content: m.content + evt.delta } : m)))
             } else if (evt.type === 'error' && evt.error) {
