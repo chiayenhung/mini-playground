@@ -1,0 +1,42 @@
+import type { Model } from '@/hooks/use-models'
+
+interface ModelSelectorProps {
+  models: Model[]
+  selectedModel: string
+  onModelChange: (modelId: string) => void
+  loading: boolean
+  error: string | null
+}
+
+export function ModelSelector({ 
+  models, 
+  selectedModel, 
+  onModelChange, 
+  loading, 
+  error 
+}: ModelSelectorProps) {
+  return (
+    <div className="flex items-center gap-2">
+      <label className="text-sm text-neutral-300">Model</label>
+      <select
+        className="rounded-md bg-neutral-900 border border-neutral-700 px-2 py-1 text-sm"
+        value={selectedModel}
+        onChange={(e) => onModelChange(e.target.value)}
+        disabled={loading}
+      >
+        {loading ? (
+          <option>Loading models...</option>
+        ) : (
+          models.map((m) => (
+            <option key={m.id} value={m.id}>
+              {m.title ?? m.display_name ?? m.id}
+            </option>
+          ))
+        )}
+      </select>
+      {error && (
+        <div className="text-xs text-red-400 ml-2">Failed to load models</div>
+      )}
+    </div>
+  )
+}

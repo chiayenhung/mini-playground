@@ -1,11 +1,10 @@
 'use client'
 
 import { useMemo, useState, useRef, useEffect } from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
 import { useModels } from '@/hooks/use-models'
 import { useChat } from '@/hooks/use-chat'
-import { markdownComponents } from '@/components/markdown-components'
+import { ModelSelector } from '@/components/model-selector'
+import { ChatMessage } from '@/components/chat-message'
 
 export default function Page() {
   const { models, loading: modelsLoading, error: modelsError } = useModels()
@@ -42,30 +41,14 @@ export default function Page() {
     <main className="mx-auto max-w-3xl p-6 space-y-4">
       <header className="flex items-center justify-between gap-4">
         <h1 className="text-xl font-semibold">Mini Model Playground</h1>
-        <div className="flex items-center gap-2">
-          <label className="text-sm text-neutral-300">Model</label>
-          <select
-            className="rounded-md bg-neutral-900 border border-neutral-700 px-2 py-1 text-sm"
-            value={selectedModel}
-            onChange={(e) => setSelectedModel(e.target.value)}
-            disabled={modelsLoading}
-          >
-            {modelsLoading ? (
-              <option>Loading models...</option>
-            ) : (
-              models.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.title ?? m.display_name ?? m.id}
-                </option>
-              ))
-            )}
-          </select>
-        </div>
+        <ModelSelector
+          models={models}
+          selectedModel={selectedModel}
+          onModelChange={setSelectedModel}
+          loading={modelsLoading}
+          error={modelsError}
+        />
       </header>
-
-      {modelsError && (
-        <div className="text-sm text-red-400">Error loading models: {modelsError}</div>
-      )}
 
       <div className="relative">
         <section 
@@ -75,42 +58,12 @@ export default function Page() {
           {messages.length === 0 && (
             <div className="text-sm text-neutral-400">Ask anything to get started.</div>
           )}
-          {messages.map((m) => (
-            <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                             <div
-                 className={`min-w-[60%] max-w-[90%] whitespace-pre-wrap rounded-md px-3 py-2 ${
-                   m.role === 'user' ? 'bg-neutral-800' : 'bg-neutral-900 border border-neutral-800'
-                 }`}
-               >
-                <div className="mb-1 text-xs uppercase tracking-wide text-neutral-400">{m.role}</div>
-                                 <div
-                   className={`text-sm leading-relaxed ${
-                     m.role === 'assistant' && m.content.startsWith('Error:') ? 'text-red-400' : ''
-                   }`}
-                 >
-                   {m.role === 'assistant' ? (
-                     <ReactMarkdown
-                       remarkPlugins={[remarkGfm]}
-                       components={markdownComponents}
-                     >
-                       {m.content}
-                     </ReactMarkdown>
-                   ) : (
-                     m.content
-                   )}
-                 </div>
-                {m.role === 'assistant' && timings[m.id]?.finishedAt && (
-                  <div className="mt-2 text-[10px] text-neutral-500">
-                    {(() => {
-                      const t = timings[m.id]
-                      const ttfb = t.firstTokenAt ? Math.max(0, t.firstTokenAt - t.startedAt) : null
-                      const total = Math.max(0, t.finishedAt! - t.startedAt)
-                      return `time to first token: ${ttfb ? ttfb.toFixed(0) : '—'} ms · total: ${total.toFixed(0)} ms`
-                    })()}
-                  </div>
-                )}
-              </div>
-            </div>
+                    {messages.map((m) => (
+            <ChatMessage
+              key={m.id}
+              message={m}
+              timing={timings[m.id]}
+            />
           ))}
           {loading && (
             <div className="text-xs text-neutral-400 animate-pulse">Streaming…</div>
