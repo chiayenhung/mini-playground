@@ -5,15 +5,13 @@ import { useModels } from '@/hooks/use-models'
 import { useChat } from '@/hooks/use-chat'
 import { ModelSelector } from '@/components/model-selector'
 import { ChatMessage } from '@/components/chat-message'
+import { ChatInput } from '@/components/chat-input'
 
 export default function Page() {
   const { models, loading: modelsLoading, error: modelsError } = useModels()
   const { messages, loading, timings, autoScroll, sendMessage, stop, toggleAutoScroll } = useChat()
   const [selectedModel, setSelectedModel] = useState<string>('')
-  const [input, setInput] = useState('')
   const chatRef = useRef<HTMLDivElement>(null)
-
-  const canSend = useMemo(() => !loading && !!selectedModel && input.trim().length > 0, [loading, selectedModel, input])
 
   // Auto-scroll to bottom when new messages arrive or content updates
   useEffect(() => {
@@ -22,13 +20,11 @@ export default function Page() {
     }
   }, [messages, autoScroll])
 
-  const onSend = async () => {
-    if (!canSend) return
-    await sendMessage(selectedModel, input)
-    setInput('')
+  const handleSendMessage = async (message: string) => {
+    await sendMessage(selectedModel, message)
   }
 
-  const onStop = () => {
+  const handleStop = () => {
     stop()
   }
 
@@ -58,7 +54,7 @@ export default function Page() {
           {messages.length === 0 && (
             <div className="text-sm text-neutral-400">Ask anything to get started.</div>
           )}
-                    {messages.map((m) => (
+          {messages.map((m) => (
             <ChatMessage
               key={m.id}
               message={m}
@@ -84,35 +80,12 @@ export default function Page() {
         </button>
       </div>
 
-      <form
-        className="flex items-end gap-2"
-        onSubmit={(e) => {
-          e.preventDefault()
-          onSend()
-        }}
-      >
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type your prompt…"
-          rows={3}
-          className="flex-1 resize-none rounded-md border border-neutral-700 bg-neutral-900 p-3 text-sm outline-none focus:border-neutral-500"
-        />
-        <div className="flex flex-col gap-2">
-          <button
-            type="submit"
-            disabled={!canSend}
-            className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium disabled:opacity-50"
-          >
-            Send
-          </button>
-          {loading && (
-            <button type="button" onClick={onStop} className="rounded-md border border-neutral-700 px-3 py-2 text-sm">
-              Stop
-            </button>
-          )}
-        </div>
-      </form>
+      <ChatInput
+        onSendMessage={handleSendMessage}
+        onStop={handleStop}
+        loading={loading}
+        disabled={!selectedModel}
+      />
     </main>
   )
 }
