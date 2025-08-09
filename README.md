@@ -6,20 +6,25 @@ A simple chat interface for interacting with Fireworks AI models. Built with Nex
 
 ## Features
 
-- **Model Selection**: Dropdown to choose from available Fireworks models
-- **Real-time Streaming**: Stream responses as they're generated
-- **Chat Interface**: Clean, responsive chat UI with user/assistant message bubbles
+- **Model Selection**: Dropdown to choose from available Fireworks models with auto-selection
+- **Real-time Streaming**: Stream responses as they're generated with live token counting
+- **Chat Interface**: Clean, responsive chat UI with adaptive message bubbles (60-90% width)
+- **Markdown Support**: Full markdown rendering for assistant responses with tables, code blocks, and formatting
 - **Auto-scroll**: Automatically scrolls to new messages with pause/resume control
-- **Performance Metrics**: Shows timing information for each response
-- **Error Handling**: Graceful error handling with user-friendly messages
+- **Performance Metrics**: Comprehensive timing data including TTFB, total time, and tokens per second
+- **Keyboard Shortcuts**: Enter to send, Shift+Enter for new lines
+- **Error Handling**: Graceful error handling with inline error display
+- **Component Architecture**: Modular design with reusable components
 
 ## Tech Stack
 
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
+- **Markdown**: react-markdown with remark-gfm for GitHub Flavored Markdown
 - **API**: Fireworks AI Chat Completions API
 - **State Management**: React hooks with custom abstractions
+- **Architecture**: Component-based design with separation of concerns
 
 ## Getting Started
 
@@ -72,29 +77,65 @@ Handles chat completions with streaming support.
 ```
 ├── app/
 │   ├── api/
-│   │   ├── chat/route.ts      # Chat completions endpoint
+│   │   ├── chat/route.ts      # Chat completions endpoint with streaming
 │   │   └── models/route.ts    # Models list endpoint
-│   ├── globals.css            # Global styles
+│   ├── globals.css            # Global styles with dark theme
 │   ├── layout.tsx             # Root layout
-│   └── page.tsx               # Main chat interface
+│   └── page.tsx               # Main chat interface (orchestration only)
+├── components/
+│   ├── chat-input.tsx         # Message input form with keyboard shortcuts
+│   ├── chat-message.tsx       # Individual message display with markdown
+│   ├── markdown-components.tsx # Markdown styling configuration
+│   └── model-selector.tsx     # Model selection dropdown
 ├── hooks/
-│   ├── use-chat.ts            # Chat functionality hook
-│   └── use-models.ts          # Models fetching hook
+│   ├── use-chat.ts            # Chat functionality with streaming & timing
+│   └── use-models.ts          # Models fetching with error handling
 └── package.json
 ```
 
-## Custom Hooks
+## Architecture
 
-### `useModels()`
-Manages model fetching with loading and error states.
+### Custom Hooks
 
-### `useChat()`
-Handles chat functionality including:
-- Message state management
-- Streaming responses
-- Auto-scroll control
-- Performance timing
-- Error handling
+#### `useModels()`
+Manages model fetching with loading and error states:
+- Fetches and normalizes model data from Fireworks API
+- Handles loading states and error recovery
+- Auto-selects first available model
+
+#### `useChat()`
+Comprehensive chat functionality including:
+- Message state management with TypeScript types
+- Real-time streaming with SSE (Server-Sent Events)
+- Auto-scroll control with pause/resume
+- Performance timing (TTFB, total time, tokens per second)
+- Token counting during streaming
+- Graceful error handling
+
+### Components
+
+#### `ModelSelector`
+- Dropdown interface for model selection
+- Loading states and error display
+- Type-safe props with proper interfaces
+
+#### `ChatMessage`
+- Individual message rendering with role-based styling
+- Full markdown support including tables, code blocks, lists
+- Performance metrics display
+- Responsive sizing (60-90% width)
+
+#### `ChatInput`
+- Message composition with multi-line support
+- Keyboard shortcuts (Enter to send, Shift+Enter for new line)
+- Form validation and submission handling
+- Integrated send/stop button logic
+
+#### `markdownComponents`
+- Custom markdown rendering configuration
+- Dark theme optimized styling
+- Table support with responsive design
+- Code syntax highlighting
 
 ## Deployment
 
