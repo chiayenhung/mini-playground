@@ -12,11 +12,11 @@ export function ChatMessage({ message, timing }: ChatMessageProps) {
   return (
     <div className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
       <div
-        className={`min-w-[60%] max-w-[90%] whitespace-pre-wrap rounded-md px-3 py-2 ${
+        className={`min-w-[80%] sm:min-w-[60%] max-w-[95%] sm:max-w-[90%] whitespace-pre-wrap rounded-md px-2 sm:px-3 py-2 ${
           message.role === 'user' ? 'bg-neutral-800' : 'bg-neutral-900 border border-neutral-800'
         }`}
       >
-        <div className="mb-1 text-xs uppercase tracking-wide text-neutral-400">{message.role}</div>
+        <div className="mb-1 text-xs uppercase tracking-wide text-neutral-400 hidden sm:block">{message.role}</div>
         <div
           className={`text-sm leading-relaxed ${
             message.role === 'assistant' && message.content.startsWith('Error:') ? 'text-red-400' : ''
@@ -34,7 +34,7 @@ export function ChatMessage({ message, timing }: ChatMessageProps) {
           )}
         </div>
         {message.role === 'assistant' && timing?.finishedAt && (
-          <div className="mt-2 text-[10px] text-neutral-500">
+          <div className="mt-2 text-[10px] text-neutral-500 hidden sm:block">
             {(() => {
               const ttfb = timing.firstTokenAt ? Math.max(0, timing.firstTokenAt - timing.startedAt) : null
               const total = Math.max(0, timing.finishedAt - timing.startedAt)

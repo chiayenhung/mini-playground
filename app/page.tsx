@@ -34,9 +34,9 @@ export default function Page() {
   }
 
   return (
-    <main className="mx-auto max-w-3xl p-6 space-y-4">
-      <header className="flex items-center justify-between gap-4">
-        <h1 className="text-xl font-semibold">Mini Model Playground</h1>
+    <main className="mx-auto max-w-3xl p-4 sm:p-6 space-y-4 min-h-screen flex flex-col">
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <h1 className="text-lg sm:text-xl font-semibold">Mini Model Playground</h1>
         <ModelSelector
           models={models}
           selectedModel={selectedModel}
@@ -46,10 +46,10 @@ export default function Page() {
         />
       </header>
 
-      <div className="relative">
+      <div className="relative flex-1">
         <section 
           ref={chatRef}
-          className="h-[60vh] overflow-y-auto rounded-lg border border-neutral-800 bg-neutral-900/50 p-4 space-y-3"
+          className="h-[50vh] sm:h-[60vh] overflow-y-auto rounded-lg border border-neutral-800 bg-neutral-900/50 p-3 sm:p-4 space-y-3"
         >
           {messages.length === 0 && (
             <div className="text-sm text-neutral-400">Ask anything to get started.</div>

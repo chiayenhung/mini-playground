@@ -18,7 +18,7 @@ export function useModels() {
         setLoading(true)
         setError(null)
         
-        const res = await fetch('/api/models', { cache: 'no-store' })
+        const res = await fetch('/api/models')
         if (!res.ok) throw new Error('Failed to load models')
         
         const raw = (await res.json()) as any[]

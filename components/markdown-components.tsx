@@ -15,7 +15,7 @@ export const markdownComponents: Components = {
   em: ({ children }) => <em className="italic text-neutral-200">{children}</em>,
   hr: () => <div className="flex justify-center my-3"><div className="text-neutral-600 text-xs font-mono">···</div></div>,
   table: ({ children }) => (
-    <div className="overflow-x-auto mb-4">
+    <div className="overflow-x-auto mb-4 -mx-2 sm:mx-0">
       <table className="min-w-full border border-neutral-600 rounded-lg">{children}</table>
     </div>
   ),
@@ -23,12 +23,12 @@ export const markdownComponents: Components = {
   tbody: ({ children }) => <tbody className="bg-neutral-900/50">{children}</tbody>,
   tr: ({ children }) => <tr className="border-b border-neutral-700">{children}</tr>,
   th: ({ children }) => (
-    <th className="px-3 py-2 text-left text-xs font-semibold text-white border-r border-neutral-700 last:border-r-0">
+    <th className="px-2 sm:px-3 py-2 text-left text-xs font-semibold text-white border-r border-neutral-700 last:border-r-0">
       {children}
     </th>
   ),
   td: ({ children }) => (
-    <td className="px-3 py-2 text-xs text-neutral-100 border-r border-neutral-700 last:border-r-0">
+    <td className="px-2 sm:px-3 py-2 text-xs text-neutral-100 border-r border-neutral-700 last:border-r-0">
       {children}
     </td>
   ),

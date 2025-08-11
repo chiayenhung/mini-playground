@@ -16,10 +16,10 @@ export function ModelSelector({
   error 
 }: ModelSelectorProps) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
       <label className="text-sm text-neutral-300">Model</label>
       <select
-        className="rounded-md bg-neutral-900 border border-neutral-700 px-2 py-1 text-sm"
+        className="w-full sm:w-auto rounded-md bg-neutral-900 border border-neutral-700 px-2 py-1 text-sm"
         value={selectedModel}
         onChange={(e) => onModelChange(e.target.value)}
         disabled={loading}
@@ -35,7 +35,7 @@ export function ModelSelector({
         )}
       </select>
       {error && (
-        <div className="text-xs text-red-400 ml-2">Failed to load models</div>
+        <div className="text-xs text-red-400 sm:ml-2">Failed to load models</div>
       )}
     </div>
   )
