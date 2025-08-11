@@ -34,7 +34,8 @@ export async function POST(req: Request) {
 
         if (!res.ok || !res.body) {
           const text = await res.text()
-          controller.enqueue(encodeSSE({ type: 'error', error: text || 'Upstream error' }))
+          const errorMessage = extractErrorMessage(text, res.status)
+          controller.enqueue(encodeSSE({ type: 'error', error: errorMessage }))
           controller.close()
           return
         }
@@ -70,7 +71,8 @@ export async function POST(req: Request) {
         controller.enqueue(encodeSSE({ type: 'done' }))
         controller.close()
       } catch (e: any) {
-        controller.enqueue(encodeSSE({ type: 'error', error: e?.message ?? 'Stream error' }))
+        const errorMessage = extractErrorMessage(e?.message || 'Stream error', 500)
+        controller.enqueue(encodeSSE({ type: 'error', error: errorMessage }))
         controller.close()
       }
     },
@@ -87,6 +89,58 @@ export async function POST(req: Request) {
 
 function encodeSSE(obj: Record<string, unknown>) {
   return new TextEncoder().encode(`data: ${JSON.stringify(obj)}\n\n`)
+}
+
+function extractErrorMessage(errorText: string, status: number): string {
+  // Try to parse JSON error response
+  try {
+    const json = JSON.parse(errorText)
+    if (json.error?.message) return json.error.message
+    if (json.message) return json.message
+    if (json.error) return json.error
+  } catch {
+    // Not JSON, continue with text processing
+  }
+
+  // Common error patterns to extract meaningful messages
+  const patterns = [
+    /"message":\s*"([^"]+)"/,
+    /"error":\s*"([^"]+)"/,
+    /error:\s*(.+?)(?:\n|$)/i,
+    /failed:\s*(.+?)(?:\n|$)/i,
+  ]
+
+  for (const pattern of patterns) {
+    const match = errorText.match(pattern)
+    if (match && match[1]) {
+      return match[1].trim()
+    }
+  }
+
+  // Fallback based on status codes
+  const statusMessages: Record<number, string> = {
+    400: 'Invalid request',
+    401: 'Authentication failed',
+    403: 'Access denied',
+    404: 'Model not found',
+    429: 'Rate limit exceeded',
+    500: 'Server error',
+    502: 'Bad gateway',
+    503: 'Service unavailable',
+  }
+
+  if (statusMessages[status]) {
+    return statusMessages[status]
+  }
+
+  // If all else fails, return a clean version of the error text
+  const cleanText = errorText
+    .replace(/\n/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 200) // Limit length
+
+  return cleanText || 'An error occurred'
 }
 
 

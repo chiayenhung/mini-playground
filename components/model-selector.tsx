@@ -35,7 +35,7 @@ export function ModelSelector({
         )}
       </select>
       {error && (
-        <div className="text-xs text-red-400 sm:ml-2">Failed to load models</div>
+        <div className="text-xs text-red-400 sm:ml-2 whitespace-normal break-words">Failed to load models: {error}</div>
       )}
     </div>
   )
