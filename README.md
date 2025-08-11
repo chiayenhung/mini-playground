@@ -13,7 +13,8 @@ A simple chat interface for interacting with Fireworks AI models. Built with Nex
 - **Auto-scroll**: Automatically scrolls to new messages with pause/resume control
 - **Performance Metrics**: Comprehensive timing data including TTFB, total time, and tokens per second
 - **Keyboard Shortcuts**: Enter to send, Shift+Enter for new lines
-- **Error Handling**: Graceful error handling with inline error display
+- **Error Handling**: Graceful error handling with clean error messages displayed in red text
+- **Mobile-Friendly**: Fully responsive design optimized for mobile devices with touch-friendly controls
 - **Component Architecture**: Modular design with reusable components
 
 ## Tech Stack
@@ -70,25 +71,25 @@ npm run dev
 Fetches available models from Fireworks API.
 
 ### `/api/chat`
-Handles chat completions with streaming support.
+Handles chat completions with streaming support and error handling.
 
 ## Project Structure
 
 ```
 ├── app/
 │   ├── api/
-│   │   ├── chat/route.ts      # Chat completions endpoint with streaming
+│   │   ├── chat/route.ts      # Chat completions endpoint with streaming & error handling
 │   │   └── models/route.ts    # Models list endpoint
-│   ├── globals.css            # Global styles with dark theme
-│   ├── layout.tsx             # Root layout
-│   └── page.tsx               # Main chat interface (orchestration only)
+│   ├── page.tsx               # Main chat interface (orchestration only)
+│   ├── globals.css            # Global styles with dark theme & mobile optimizations
+│   └── layout.tsx             # Root layout with mobile viewport configuration
 ├── components/
-│   ├── chat-input.tsx         # Message input form with keyboard shortcuts
-│   ├── chat-message.tsx       # Individual message display with markdown
+│   ├── chat-input.tsx         # Message input form with keyboard shortcuts & mobile optimization
+│   ├── chat-message.tsx       # Individual message display with markdown & error styling
 │   ├── markdown-components.tsx # Markdown styling configuration
-│   └── model-selector.tsx     # Model selection dropdown
+│   └── model-selector.tsx     # Model selection dropdown with mobile optimization
 ├── hooks/
-│   ├── use-chat.ts            # Chat functionality with streaming & timing
+│   ├── use-chat.ts            # Chat functionality with streaming, timing & error handling
 │   └── use-models.ts          # Models fetching with error handling
 └── package.json
 ```
@@ -105,12 +106,13 @@ Manages model fetching with loading and error states:
 
 #### `useChat()`
 Comprehensive chat functionality including:
-- Message state management with TypeScript types
+- Message state management with TypeScript types including error message types
 - Real-time streaming with SSE (Server-Sent Events)
 - Auto-scroll control with pause/resume
 - Performance timing (TTFB, total time, tokens per second)
 - Token counting during streaming
-- Graceful error handling
+- Graceful error handling with clean error message extraction
+- Error message type classification for proper styling
 
 ### Components
 
@@ -118,24 +120,72 @@ Comprehensive chat functionality including:
 - Dropdown interface for model selection
 - Loading states and error display
 - Type-safe props with proper interfaces
+- Mobile-optimized touch targets
 
 #### `ChatMessage`
 - Individual message rendering with role-based styling
 - Full markdown support including tables, code blocks, lists
 - Performance metrics display
 - Responsive sizing (60-90% width)
+- Error message styling with red text and red-themed markdown components
+- Mobile-optimized layout
 
 #### `ChatInput`
 - Message composition with multi-line support
 - Keyboard shortcuts (Enter to send, Shift+Enter for new line)
 - Form validation and submission handling
 - Integrated send/stop button logic
+- Mobile-optimized with touch-friendly buttons and reduced textarea height
 
 #### `markdownComponents`
 - Custom markdown rendering configuration
 - Dark theme optimized styling
 - Table support with responsive design
 - Code syntax highlighting
+- Error-specific red-themed markdown components
+
+## Mobile Optimizations
+
+### Viewport Configuration
+- Proper mobile viewport settings to prevent unwanted zooming
+- Device-width scaling with initial scale of 1
+- User-scalable disabled for consistent experience
+
+### Touch-Friendly Design
+- All interactive elements have minimum 44px height for easy tapping
+- Optimized button and input sizes for mobile screens
+- Responsive padding and spacing adjustments
+
+### Mobile-Specific Features
+- Reduced textarea height (2 rows instead of 3) on mobile
+- Smaller padding and margins for better space utilization
+- Improved chat message width (85% on mobile vs 60% on desktop)
+- Touch-optimized scrolling with `-webkit-overflow-scrolling: touch`
+
+### Input Optimization
+- Font size set to 16px on mobile to prevent iOS zoom on focus
+- Touch-friendly form controls with proper sizing
+- Responsive layout that adapts to different screen sizes
+
+## Error Handling
+
+### Clean Error Messages
+- Extracts meaningful error messages from API responses
+- Removes technical details and stack traces
+- Provides user-friendly error descriptions
+- Supports common error patterns and HTTP status codes
+
+### Visual Error Indicators
+- Error messages displayed in red text
+- Red-themed markdown components for error content
+- Red border and background tint for error message containers
+- Consistent error styling across all markdown elements
+
+### Error Types Supported
+- API errors (rate limiting, authentication, etc.)
+- Network errors
+- Model-specific errors
+- Server errors with appropriate status code mapping
 
 ## Potential Improvements
 
