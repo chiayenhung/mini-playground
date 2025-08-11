@@ -1,44 +1,7 @@
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { markdownComponents } from './markdown-components'
+import { createMarkdownComponents } from './markdown-components'
 import type { ChatMessage as ChatMessageType, ChatTiming } from '@/hooks/use-chat'
-import type { Components } from 'react-markdown'
-
-function getErrorMarkdownComponents(): Components {
-  return {
-    h1: ({ children }) => <h1 className="text-lg font-bold mb-2" style={{ color: '#fca5a5' }}>{children}</h1>,
-    h2: ({ children }) => <h2 className="text-base font-semibold mb-2" style={{ color: '#fca5a5' }}>{children}</h2>,
-    h3: ({ children }) => <h3 className="text-sm font-medium mb-1" style={{ color: '#fca5a5' }}>{children}</h3>,
-    p: ({ children }) => <p className="mb-2 last:mb-0" style={{ color: '#f87171' }}>{children}</p>,
-    ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1" style={{ color: '#f87171' }}>{children}</ul>,
-    ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1" style={{ color: '#f87171' }}>{children}</ol>,
-    li: ({ children }) => <li className="text-sm" style={{ color: '#f87171' }}>{children}</li>,
-    code: ({ children }) => <code className="bg-red-950/50 px-1 py-0.5 rounded text-xs" style={{ color: '#fecaca' }}>{children}</code>,
-    pre: ({ children }) => <pre className="bg-red-950/50 p-2 rounded overflow-x-auto text-xs mb-2" style={{ color: '#fecaca' }}>{children}</pre>,
-    blockquote: ({ children }) => <blockquote className="border-l-2 border-red-600 pl-3 italic mb-2" style={{ color: '#fca5a5' }}>{children}</blockquote>,
-    strong: ({ children }) => <strong className="font-semibold" style={{ color: '#fca5a5' }}>{children}</strong>,
-    em: ({ children }) => <em className="italic" style={{ color: '#fca5a5' }}>{children}</em>,
-    hr: () => <div className="flex justify-center my-3"><div className="text-red-600 text-xs font-mono">···</div></div>,
-    table: ({ children }) => (
-      <div className="overflow-x-auto mb-4 -mx-2 sm:mx-0">
-        <table className="min-w-full border border-red-600 rounded-lg">{children}</table>
-      </div>
-    ),
-    thead: ({ children }) => <thead className="bg-red-950/50">{children}</thead>,
-    tbody: ({ children }) => <tbody className="bg-red-900/30">{children}</tbody>,
-    tr: ({ children }) => <tr className="border-b border-red-700">{children}</tr>,
-    th: ({ children }) => (
-      <th className="px-2 sm:px-3 py-2 text-left text-xs font-semibold border-r border-red-700 last:border-r-0" style={{ color: '#fca5a5' }}>
-        {children}
-      </th>
-    ),
-    td: ({ children }) => (
-      <td className="px-2 sm:px-3 py-2 text-xs border-r border-red-700 last:border-r-0" style={{ color: '#f87171' }}>
-        {children}
-      </td>
-    ),
-  }
-}
 
 interface ChatMessageProps {
   message: ChatMessageType
@@ -66,7 +29,7 @@ export function ChatMessage({ message, timing }: ChatMessageProps) {
             <div style={isError ? { color: '#f87171' } : undefined}>
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
-                components={isError ? getErrorMarkdownComponents() : markdownComponents}
+                components={createMarkdownComponents({ showError: isError })}
               >
                 {message.content}
               </ReactMarkdown>
