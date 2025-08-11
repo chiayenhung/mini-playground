@@ -51,7 +51,7 @@ export function ChatMessage({ message, timing }: ChatMessageProps) {
   return (
     <div className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
       <div
-        className={`min-w-[80%] sm:min-w-[60%] max-w-[95%] sm:max-w-[90%] whitespace-pre-wrap rounded-md px-2 sm:px-3 py-2 ${
+        className={`min-w-[85%] sm:min-w-[60%] max-w-[95%] sm:max-w-[90%] whitespace-pre-wrap rounded-md px-2 sm:px-3 py-2 ${
           message.role === 'user' ? 'bg-neutral-800' : 'bg-neutral-900 border border-neutral-800'
         } ${isError ? 'border-red-500/50 bg-red-950/20' : ''}`}
       >

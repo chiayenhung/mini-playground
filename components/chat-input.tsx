@@ -37,15 +37,15 @@ export function ChatInput({ onSendMessage, onStop, loading, disabled }: ChatInpu
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Type your prompt… (Enter to send, Shift+Enter for new line)"
-        rows={3}
-        className="w-full sm:flex-1 resize-none rounded-md border border-neutral-700 bg-neutral-900 p-3 text-sm outline-none focus:border-neutral-500"
+        rows={2}
+        className="w-full sm:flex-1 resize-none rounded-md border border-neutral-700 bg-neutral-900 p-2 sm:p-3 text-sm outline-none focus:border-neutral-500"
         disabled={disabled}
       />
       <div className="flex sm:flex-col gap-2 w-full sm:w-auto">
         <button
           type="submit"
           disabled={!canSend}
-          className="flex-1 sm:flex-none rounded-md bg-blue-600 px-3 py-2 text-sm font-medium disabled:opacity-50"
+          className="flex-1 sm:flex-none rounded-md bg-blue-600 px-3 py-2 text-sm font-medium disabled:opacity-50 min-h-[44px]"
         >
           Send
         </button>
@@ -53,7 +53,7 @@ export function ChatInput({ onSendMessage, onStop, loading, disabled }: ChatInpu
           <button 
             type="button" 
             onClick={onStop} 
-            className="flex-1 sm:flex-none rounded-md border border-neutral-700 px-3 py-2 text-sm"
+            className="flex-1 sm:flex-none rounded-md border border-neutral-700 px-3 py-2 text-sm min-h-[44px]"
           >
             Stop
           </button>
