@@ -66,6 +66,46 @@ npm run dev
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+## Testing
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run only API tests
+npm run test:api
+
+# Run API tests in watch mode
+npm run test:api:watch
+```
+
+### Test Coverage
+
+The test suite includes comprehensive coverage for:
+- **API Routes**: Full testing of `/api/chat` and `/api/models` endpoints
+- **Error Handling**: Testing of various error scenarios and edge cases
+- **Streaming**: Testing of streaming responses and data parsing
+- **Input Validation**: Testing of request validation and error responses
+
+### Test Structure
+
+```
+__tests__/
+├── api/
+│   ├── chat.test.ts      # Chat API route tests
+│   └── models.test.ts    # Models API route tests
+└── utils/
+    └── test-utils.ts     # Common test utilities
+```
+
 ## API Endpoints
 
 ### `/api/models`
@@ -233,6 +273,7 @@ Analytics are calculated server-side and streamed to the client for accurate per
 - **Custom Prompts**: Predefined prompt templates and user-saved prompts
 - **File Uploads**: Support for image, document, and code file uploads
 - **Reasoning Content Styling**: Distinct visual styling for reasoning_content vs regular content to differentiate model reasoning from final responses
+- **Theming Support**: Light/dark mode toggle with customizable color schemes and theme persistence
 
 ### Performance & Monitoring
 - **Advanced Analytics**: Enhanced performance metrics with detailed breakdowns
@@ -242,7 +283,8 @@ Analytics are calculated server-side and streamed to the client for accurate per
 - **Performance Dashboard**: Real-time performance monitoring and historical data
 
 ### Developer Experience
-- **Testing**: Add unit tests (Jest), integration tests (Playwright), and component tests (Testing Library)
+- **Testing**: Unit tests with Jest for API routes, integration tests, and component tests
+- **Coverage**: Code coverage reporting for API endpoints
 - **Storybook**: Component documentation and visual testing
 - **API Documentation**: OpenAPI/Swagger documentation for the chat API
 - **CI/CD Pipeline**: Automated testing, linting, and deployment workflows
