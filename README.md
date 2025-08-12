@@ -11,11 +11,12 @@ A simple chat interface for interacting with Fireworks AI models. Built with Nex
 - **Chat Interface**: Clean, responsive chat UI with adaptive message bubbles (60-90% width)
 - **Markdown Support**: Full markdown rendering for assistant responses with tables, code blocks, and formatting
 - **Auto-scroll**: Automatically scrolls to new messages with pause/resume control
-- **Performance Metrics**: Comprehensive timing data including TTFB, total time, and tokens per second
+- **Performance Analytics**: Real-time token analytics including TTFB, total time, and tokens per second
 - **Keyboard Shortcuts**: Enter to send, Shift+Enter for new lines
 - **Error Handling**: Graceful error handling with clean error messages displayed in red text
 - **Mobile-Friendly**: Fully responsive design optimized for mobile devices with touch-friendly controls
 - **Component Architecture**: Modular design with reusable components
+- **Shared Utilities**: Centralized error handling and utility functions
 
 ## Tech Stack
 
@@ -71,15 +72,15 @@ npm run dev
 Fetches available models from Fireworks API.
 
 ### `/api/chat`
-Handles chat completions with streaming support and error handling.
+Handles chat completions with streaming support, error handling, and real-time performance analytics.
 
 ## Project Structure
 
 ```
 ├── app/
 │   ├── api/
-│   │   ├── chat/route.ts      # Chat completions endpoint with streaming & error handling
-│   │   └── models/route.ts    # Models list endpoint
+│   │   ├── chat/route.ts      # Chat completions endpoint with streaming, error handling & analytics
+│   │   └── models/route.ts    # Models list endpoint with enhanced error handling
 │   ├── page.tsx               # Main chat interface (orchestration only)
 │   ├── globals.css            # Global styles with dark theme & mobile optimizations
 │   └── layout.tsx             # Root layout with mobile viewport configuration
@@ -89,7 +90,7 @@ Handles chat completions with streaming support and error handling.
 │   ├── markdown-components.tsx # Markdown styling configuration
 │   └── model-selector.tsx     # Model selection dropdown with mobile optimization
 ├── hooks/
-│   ├── use-chat.ts            # Chat functionality with streaming, timing & error handling
+│   ├── use-chat.ts            # Chat functionality with streaming, analytics & error handling
 │   └── use-models.ts          # Models fetching with error handling
 ├── lib/
 │   └── utils/
@@ -110,13 +111,13 @@ Manages model fetching with loading and error states:
 
 #### `useChat()`
 Comprehensive chat functionality including:
-- Message state management with TypeScript types including error message types
+- Message state management with TypeScript types including error message types and analytics
 - Real-time streaming with SSE (Server-Sent Events)
 - Auto-scroll control with pause/resume
-- Performance timing (TTFB, total time, tokens per second)
-- Token counting during streaming
+- Performance analytics (TTFB, total time, tokens per second) with real-time updates
 - Graceful error handling with clean error message extraction
 - Error message type classification for proper styling
+- Analytics integration for performance monitoring
 
 ### Components
 
@@ -129,7 +130,7 @@ Comprehensive chat functionality including:
 #### `ChatMessage`
 - Individual message rendering with role-based styling
 - Full markdown support including tables, code blocks, lists
-- Performance metrics display
+- Performance analytics display (TTFB, total time, tokens per second)
 - Responsive sizing (60-90% width)
 - Error message styling with red text and red-themed markdown components
 - Mobile-optimized layout
@@ -202,6 +203,17 @@ The project includes shared error handling utilities in `lib/utils/error-handlin
 
 These utilities are used by both API routes and client-side code for consistent error handling.
 
+### Performance Analytics
+
+The application provides real-time performance analytics for each chat response:
+
+- **TTFB (Time to First Byte)**: Time from request start to first token received
+- **Total Time**: Complete response generation time
+- **Tokens per Second**: Real-time token generation rate
+- **Token Count**: Total tokens generated for the response
+
+Analytics are calculated server-side and streamed to the client for accurate performance monitoring.
+
 ## Potential Improvements
 
 ### Data & State Management
@@ -220,18 +232,21 @@ These utilities are used by both API routes and client-side code for consistent 
 - **Model Comparison**: Side-by-side comparison of responses from different models
 - **Custom Prompts**: Predefined prompt templates and user-saved prompts
 - **File Uploads**: Support for image, document, and code file uploads
+- **Reasoning Content Styling**: Distinct visual styling for reasoning_content vs regular content to differentiate model reasoning from final responses
 
 ### Performance & Monitoring
-- **Real Token Counting**: Integrate with tiktoken or model-specific tokenizers for accurate counts
-- **Analytics**: Track usage patterns, model performance, and user interactions
+- **Advanced Analytics**: Enhanced performance metrics with detailed breakdowns
+- **Usage Analytics**: Track usage patterns, model performance, and user interactions
 - **Error Tracking**: Implement Sentry or similar for production error monitoring
 - **Rate Limiting**: Add client-side rate limiting and queue management
+- **Performance Dashboard**: Real-time performance monitoring and historical data
 
 ### Developer Experience
 - **Testing**: Add unit tests (Jest), integration tests (Playwright), and component tests (Testing Library)
 - **Storybook**: Component documentation and visual testing
 - **API Documentation**: OpenAPI/Swagger documentation for the chat API
 - **CI/CD Pipeline**: Automated testing, linting, and deployment workflows
+- **Performance Testing**: Benchmark and optimize API response times and streaming performance
 
 ## Deployment
 
