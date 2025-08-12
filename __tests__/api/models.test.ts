@@ -40,7 +40,7 @@ describe('/api/models', () => {
     const data = await response.json()
 
     expect(response.status).toBe(500)
-    expect(data).toEqual({ error: 'Failed to fetch models' })
+    expect(data).toEqual({ error: 'Server error' })
   })
 
   it('should return error when API call throws an exception', async () => {
@@ -50,32 +50,34 @@ describe('/api/models', () => {
     const data = await response.json()
 
     expect(response.status).toBe(500)
-    expect(data).toEqual({ error: 'Failed to fetch models' })
+    expect(data).toEqual({ error: 'Server error' })
   })
 
   it('should handle 404 status from API', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: false,
-      status: 404
+      status: 404,
+      text: async () => 'Not found'
     } as Response)
 
     const response = await GET()
     const data = await response.json()
 
     expect(response.status).toBe(404)
-    expect(data).toEqual({ error: 'Failed to fetch models' })
+    expect(data).toEqual({ error: 'Model not found' })
   })
 
   it('should handle 403 status from API', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: false,
-      status: 403
+      status: 403,
+      text: async () => 'Forbidden'
     } as Response)
 
     const response = await GET()
     const data = await response.json()
 
     expect(response.status).toBe(403)
-    expect(data).toEqual({ error: 'Failed to fetch models' })
+    expect(data).toEqual({ error: 'Access denied' })
   })
 })
