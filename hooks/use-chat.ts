@@ -15,11 +15,16 @@ export type ChatTiming = {
   tokenCount?: number
 }
 
+export type ChatAnalytics = {
+  tokensPerSecond?: string
+  ttfb?: number
+  totalTime?: number
+}
+
 export function useChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [timings, setTimings] = useState<Record<string, ChatTiming>>({})
   const [autoScroll, setAutoScroll] = useState(true)
   const abortRef = useRef<AbortController | null>(null)
 
@@ -36,8 +41,6 @@ export function useChat() {
 
     const controller = new AbortController()
     abortRef.current = controller
-    const startedAt = performance.now()
-    setTimings((t) => ({ ...t, [assistantId]: { startedAt, tokenCount: 0 } }))
 
     try {
       const res = await fetch('/api/chat', {
@@ -74,29 +77,22 @@ export function useChat() {
           const payload = part.slice(5).trim()
           if (payload === '[DONE]') continue
           try {
-            const evt = JSON.parse(payload) as { type: string; delta?: string; error?: string }
+            const evt = JSON.parse(payload) as { type: string; delta?: string; error?: string; analytics?: ChatAnalytics }
             if (evt.type === 'content.delta' && evt.delta) {
-              setTimings((t) => {
-                const prev = t[assistantId]
-                const tokenCount = (prev?.tokenCount || 0) + 1 // Increment token count
-                return prev?.firstTokenAt
-                  ? { ...t, [assistantId]: { ...prev, tokenCount } }
-                  : { ...t, [assistantId]: { ...prev, firstTokenAt: performance.now(), tokenCount } }
-              })
               setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, content: m.content + evt.delta } : m)))
+            } else if (evt.type === 'analytics' && evt.analytics) {
+              setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, analytics: evt.analytics } : m)))
             } else if (evt.type === 'error' && evt.error) {
               setMessages((prev) =>
-                prev.map((m) => (m.id === assistantId ? { ...m, content: evt.error || 'Unknown error', type: 'error' } : m)),
+                prev.map((m) => (m.id === assistantId ? { ...m, content: m.content + (evt.error || 'Unknown error'), type: 'error' } : m)),
               )
             }
           } catch {}
         }
       }
-      setTimings((t) => ({ ...t, [assistantId]: { ...t[assistantId], finishedAt: performance.now() } }))
     } catch (e: any) {
       const msg = extractErrorMessage(e?.message ?? 'Unexpected error', 500)
       setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: 'assistant', content: msg, type: 'error' }])
-      setTimings((t) => ({ ...t, [assistantId]: { ...t[assistantId], finishedAt: performance.now() } }))
     } finally {
       setLoading(false)
       abortRef.current = null
@@ -109,7 +105,6 @@ export function useChat() {
 
   const clearMessages = useCallback(() => {
     setMessages([])
-    setTimings({})
     setError(null)
   }, [])
 
@@ -121,7 +116,6 @@ export function useChat() {
     messages,
     loading,
     error,
-    timings,
     autoScroll,
     sendMessage,
     stop,

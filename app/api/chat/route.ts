@@ -5,6 +5,19 @@ type InMessage = { role: 'user' | 'assistant' | 'system'; content: string }
 
 export const runtime = 'edge'
 
+function getTokenAnalytics(usage: any, startTime: number, completionTime: number, firstTokenAt: number | null) {
+  if (!usage) return null;
+  if (!startTime) return null;
+
+  const totalTime = completionTime - startTime;
+
+  return {
+    tokensPerSecond: totalTime > 0 ? (usage.total_tokens / (totalTime / 1000)).toFixed(1) : '—',
+    ttfb: firstTokenAt ? firstTokenAt - startTime : null,
+    totalTime: totalTime,
+  }
+}
+
 export async function POST(req: Request) {
   const { model, messages } = (await req.json()) as {
     model: string
@@ -20,6 +33,8 @@ export async function POST(req: Request) {
   const stream = new ReadableStream({
     async start(controller) {
       try {
+        const startTime = performance.now();
+
         const res = await fetch(`https://api.fireworks.ai/inference/v1/chat/completions`, {
           method: 'POST',
           headers: {
@@ -45,9 +60,13 @@ export async function POST(req: Request) {
         const decoder = new TextDecoder()
         let buffer = ''
 
+        let streamStarted = false;
+        let firstTokenAt = null;
+
         while (true) {
           const { value, done } = await reader.read()
-          if (done) break
+          if (done) break;
+
           buffer += decoder.decode(value, { stream: true })
 
           const lines = buffer.split('\n')
@@ -59,9 +78,15 @@ export async function POST(req: Request) {
             try {
               const json = JSON.parse(payload)
               // Fireworks streaming format includes choices[0].delta.content
-              const delta = json?.choices?.[0]?.delta?.content
+              const delta = json?.choices?.[0]?.delta?.reasoning_content || json?.choices?.[0]?.delta?.content
               if (typeof delta === 'string' && delta.length > 0) {
+                if (!streamStarted) {
+                  streamStarted = true;
+                  firstTokenAt = performance.now();
+                }
                 controller.enqueue(encodeSSE({ type: 'content.delta', delta }))
+              } else if (json?.usage) {
+                controller.enqueue(encodeSSE({ type: 'analytics', analytics: getTokenAnalytics(json?.usage, startTime, performance.now(), firstTokenAt) }))
               }
             } catch {
               // ignore non-json heartbeats

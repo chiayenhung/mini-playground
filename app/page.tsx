@@ -9,7 +9,7 @@ import { ChatInput } from '@/components/chat-input'
 
 export default function Page() {
   const { models, loading: modelsLoading, error: modelsError } = useModels()
-  const { messages, loading, timings, autoScroll, sendMessage, stop, toggleAutoScroll } = useChat()
+  const { messages, loading, autoScroll, sendMessage, stop, toggleAutoScroll } = useChat()
   const [selectedModel, setSelectedModel] = useState<string>('')
   const chatRef = useRef<HTMLDivElement>(null)
 
@@ -58,7 +58,7 @@ export default function Page() {
             <ChatMessage
               key={m.id}
               message={m}
-              timing={timings[m.id]}
+              analytics={m.analytics}
             />
           ))}
           {loading && (
