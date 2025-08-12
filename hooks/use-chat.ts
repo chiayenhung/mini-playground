@@ -95,7 +95,7 @@ export function useChat() {
       setTimings((t) => ({ ...t, [assistantId]: { ...t[assistantId], finishedAt: performance.now() } }))
     } catch (e: any) {
       const msg = extractErrorMessage(e?.message ?? 'Unexpected error', 500)
-      setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, content: msg, type: 'error' } : m)))
+      setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: 'assistant', content: msg, type: 'error' }])
       setTimings((t) => ({ ...t, [assistantId]: { ...t[assistantId], finishedAt: performance.now() } }))
     } finally {
       setLoading(false)
