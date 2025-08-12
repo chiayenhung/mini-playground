@@ -91,6 +91,10 @@ Handles chat completions with streaming support and error handling.
 ├── hooks/
 │   ├── use-chat.ts            # Chat functionality with streaming, timing & error handling
 │   └── use-models.ts          # Models fetching with error handling
+├── lib/
+│   └── utils/
+│       ├── error-handling.ts  # Shared error handling utilities
+│       └── index.ts           # Utility exports
 └── package.json
 ```
 
@@ -186,6 +190,17 @@ Comprehensive chat functionality including:
 - Network errors
 - Model-specific errors
 - Server errors with appropriate status code mapping
+
+### Shared Error Handling Utilities
+
+The project includes shared error handling utilities in `lib/utils/error-handling.ts`:
+
+- **`extractErrorMessage()`**: Extracts clean, user-friendly messages from various error formats
+- **`classifyError()`**: Classifies errors by type (network, authentication, rate limit, etc.)
+- **`createError()`**: Creates standardized error objects with metadata
+- **`ErrorTypes`**: Constants for consistent error type classification
+
+These utilities are used by both API routes and client-side code for consistent error handling.
 
 ## Potential Improvements
 
