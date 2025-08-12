@@ -56,6 +56,21 @@ global.NextResponse = {
   }
 }
 
+// Mock NextResponse module
+jest.mock('next/server', () => ({
+  NextResponse: {
+    json: (data, init) => {
+      return new Response(JSON.stringify(data), {
+        status: init?.status || 200,
+        headers: {
+          'Content-Type': 'application/json',
+          ...init?.headers
+        }
+      })
+    }
+  }
+}))
+
 // Mock ReadableStream for streaming tests
 global.ReadableStream = class ReadableStream {
   constructor(init) {
